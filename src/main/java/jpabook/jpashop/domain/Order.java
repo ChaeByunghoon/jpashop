@@ -1,6 +1,7 @@
 package jpabook.jpashop.domain;
 
 
+import jpabook.jpashop.domain.item.Item;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
+// 엔티티에 대부분의 비즈니스 로직을 집어넣는 것을 도메인 모델 패턴이라고 한다.
+// 서비스 계층은 단순히 엔티티에 필요한 요청을 위임하는 역할.
+// 반대로 엔티티에는 게터세터 밖에 없고 서비스에 대부분의 로직이 있는 경우 트랜잭션 스크립트 패턴 이라고 명명
 @Entity
 @Table(name = "orders")
 @Getter @Setter
@@ -38,6 +43,10 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    protected Order(){
+
+    }
+
     // 연관관계 메서드 //
     // 핵심 적으로 컨트롤 하는 쪽이 좋음. 양방향에서 원자적으로 해결.
     public void setMember(Member member){
@@ -53,5 +62,42 @@ public class Order {
     public void setDelivery(Delivery delivery){
         this.delivery = delivery;
         delivery.setOrder(this);
+    }
+
+    //== 주문 생성 메서도== //
+    // 생성할 때부터 그냥 해버림// 완결
+    // 복잡한 비즈니스 로직은 static으로 그냥
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems){
+        Order order = new Order();
+        order.setMember(member);
+        order.setDelivery(delivery);
+        for (OrderItem item: orderItems){
+            order.addOrderItem(item);
+        }
+        order.setStatus(OrderStatus.ORDER);
+        order.setOrderDate(LocalDateTime.now());
+        return order;
+    }
+
+    //== 비즈니스 로직 //
+    //주문 취소
+    // 재고 올려줌
+
+    public void cancel(){
+        if(delivery.getDeleveryStatus() == DeliveryStatus.COMP){
+            throw new IllegalStateException("이미 배송 완료된 상품은 취소 불가능 ");
+        }
+
+        this.setStatus(OrderStatus.CANCEL);
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel();
+        }
+    }
+
+    //== 조회 로직 == //
+    public int getTotalPrice(){
+        return orderItems.stream()
+                .mapToInt(OrderItem::getTotalPrice)
+                .sum();
     }
 }

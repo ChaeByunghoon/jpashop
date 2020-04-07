@@ -28,4 +28,27 @@ public class OrderItem {
     private int orderPrice;
     private int count;
 
+    protected OrderItem(){
+
+    }
+
+    public static OrderItem createOrderItem(Item item, int orderPrice, int count){
+        OrderItem orderItem = new OrderItem();
+        orderItem.setItem(item);
+        // 혹시 모른 가격이나 이런 것들로 인해 바뀌면 ? 그래서 이거로
+        orderItem.setOrderPrice(orderPrice);
+        orderItem.setCount(count);
+        // 재고 까기
+        item.removeStock(count);
+        return orderItem;
+    }
+
+    public void cancel(){
+        getItem().addStock(count);
+    }
+
+    public int getTotalPrice(){
+        return orderPrice * getCount();
+    }
+
 }
