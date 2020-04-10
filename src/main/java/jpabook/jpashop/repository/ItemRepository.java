@@ -19,6 +19,9 @@ public class ItemRepository {
             em.persist(item);
         }else{
             // merge 는 Update 로직.
+            // 준 영속상태의 엔티티를 영속상태로 변경 하는 역할
+            // 근데 병합을 사용해버리면 모든 속성ㅇ ㅣ다 변경됨.
+            // 만약에 병합시 값이 없으면 다 null로 변경됨.
             em.merge(item);
         }
     }

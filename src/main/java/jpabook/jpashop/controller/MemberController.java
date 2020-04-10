@@ -45,7 +45,7 @@ public class MemberController {
         return "redirect:/";
     }
 
-    // API 쓸 때는 Entity 절때 쓰지마라 = > DTO를 만들즌지 해라
+    // API 쓸 때는 Entity 절때 쓰지마라 = > DTO를 만들즌지 해라 왜냐면 엔티티 변화가 API 변화를 초래함.
     // 웬만하면 DTO를 써라 새끼야.
     @GetMapping("/members/list")
     public String list(Model model){
